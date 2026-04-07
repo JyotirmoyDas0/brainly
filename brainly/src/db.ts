@@ -1,5 +1,6 @@
 import mongoose, {model,Schema} from "mongoose";
 import { MONGO_URL } from "./config.js";
+import { required } from "zod/mini";
 
 mongoose.connect(MONGO_URL)
 
@@ -14,8 +15,16 @@ const UserSchema= new Schema(
 const ContentSchema=new Schema({
     title:String,
     link:String,
-    type:String,
-    tags:[{type:mongoose.Types.ObjectId, ref:'Tag'}],
+    description:String,
+    type:{
+        type:String,
+        enum:["youtube","twitter","note"],
+        required:true,
+    },
+    tags:{
+        type:[String],
+        default:[],
+    },
     userId:{type:mongoose.Types.ObjectId, ref:'User', required:true}
 })
 

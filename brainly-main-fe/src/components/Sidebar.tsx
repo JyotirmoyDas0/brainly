@@ -6,7 +6,7 @@ import { DocumentIcon } from "../icons/DocumentIcon";
 import { LinkIcon } from "../icons/LinkIcon";
 import { TagIcon } from "../icons/TagIcon";
 
-export function Sidebar() {
+export function Sidebar({ setFilter }: { setFilter: (value: "all" | "youtube" | "twitter" | "note") => void }) {
   return (
     <div className="h-screen bg-white border w-72 fixed left-0 top-0 pl-6">
       <div className="flex pt-4 align-middle items-center">
@@ -18,9 +18,10 @@ export function Sidebar() {
         </div>
       </div>
       <div className="pt-4">
-        <SidebarItem text="Twitter" icon={<XIcon />} />
-        <SidebarItem text="Youtube" icon={<YoutubeIcon />} />
-        <SidebarItem text="Documents" icon={<DocumentIcon />} />
+        <SidebarItem onClick={()=>setFilter("all")} text="All Content" />
+        <SidebarItem onClick={()=>setFilter("twitter")} text="Twitter" icon={<XIcon />} />
+        <SidebarItem onClick={()=>setFilter("youtube")} text="Youtube" icon={<YoutubeIcon />} />
+        <SidebarItem onClick={()=>setFilter("note")}text="Note" icon={<DocumentIcon />} />
         <SidebarItem text="Links" icon={<LinkIcon/>} />
         <SidebarItem text="Tags" icon={<TagIcon />} />
       </div>

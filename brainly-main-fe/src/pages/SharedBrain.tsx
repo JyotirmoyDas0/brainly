@@ -49,6 +49,8 @@ export function SharedBrain() {
                   type={item.type}
                   link={item.link}
                   title={item.title}
+                  description={item.description}
+                  tags={item.tags}
                 />
               ))
             )}

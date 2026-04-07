@@ -78,17 +78,30 @@ app.post("/api/v1/content", UserMiddleware, async (req, res) => {
   const link = req.body.link;
   const type = req.body.type;
   const title = req.body.title;
-  if (!link || !type || !title) {
-  return res.status(400).json({ message: "Missing fields" });
-}
+  const description = req.body.description;
+  const tags = req.body.tags || [];
+  if (!type || !title) {
+    return res.status(400).json({ message: "Missing fields" });
+  }
+
+  if (!link && type !== "note")
+    return res.status(400).json({ message: "Link required for this type" });
+
+  if (type === "note" && !description) {
+    return res.status(400).json({
+      message: "Description required for notes",
+    });
+  }
+
   try {
     await ContentModel.create({
       link,
       type,
       title,
+      description,
       //@ts-ignore
       userId: req.userId,
-      tags: [],
+      tags:tags,
     });
     return res.json({
       message: "Content added",
@@ -101,15 +114,56 @@ app.post("/api/v1/content", UserMiddleware, async (req, res) => {
 app.get("/api/v1/content", UserMiddleware, async (req, res) => {
   //@ts-ignore
   const userId = req.userId;
-  try{const content = await ContentModel.find({
-    userId: userId,
-  }).populate("userId", "username");
-  res.json({
-    content,
-  });
-}
-catch(e){res.status(500).json({message:"Something went wrong"})}
+  try {
+    const content = await ContentModel.find({
+      userId: userId,
+    }).populate("userId", "username");
+    res.json({
+      content,
+    });
+  } catch (e) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
 });
+
+app.get("/api/v1/content/search", UserMiddleware, async(req,res)=>{
+
+  const query=(req.query.q as string) || "";
+  //@ts-ignore
+  const userId=req.userId;
+
+  try{
+    const result = await ContentModel.find({
+      userId:userId,
+      $or:[
+        {title:{$regex:query, $options:"i"}},
+        {description:{$regex:query, $options:"i"}},
+        {tags:{$regex:query, $options:"i"}},
+      ],
+    });
+
+    res.json({content:result})
+  }
+  catch(e){
+    res.status(500).json({message:"Search Failed"});
+  }
+})
+
+app.get("/api/v1/tag/:tag", UserMiddleware, async(req,res)=>{
+  const tag=(req.params.tag as string) || "";
+  //@ts-ignore
+  const userId=req.userId;
+  try{
+    const result= await ContentModel.find({
+      userId:userId,
+      tags:tag,
+    });
+    res.json({content:result});
+  }
+  catch(e){
+    res.status(500).json({message:"No matching content found"})
+  }
+})
 
 app.delete("/api/v1/content/:id", UserMiddleware, async (req, res) => {
   const contentId = req.params.id;
@@ -205,6 +259,7 @@ app.get("/api/v1/brain/:shareLink", async (req, res) => {
       type: items.type,
       link: items.link,
       title: items.title,
+      description: items.description,
       tags: items.tags,
     }));
 
