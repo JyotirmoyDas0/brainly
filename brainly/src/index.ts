@@ -126,6 +126,28 @@ app.get("/api/v1/content", UserMiddleware, async (req, res) => {
   }
 });
 
+app.put("/api/v1/content/:id", UserMiddleware, async(req,res)=>{
+  const contentId=req.params.id;
+  const {title, link, description, tags}=req.body;
+
+  try{
+    await ContentModel.updateOne({
+      _id: contentId,
+      //@ts-ignore
+      userId:req.userId,
+  },{
+    title,
+    link,
+    description,
+    tags
+  })
+  res.status(200).json({message:"Content updated successfully"})
+  }
+  catch(e){
+    res.status(500).json({message:"Update Failed"})
+  }
+})
+
 app.get("/api/v1/content/search", UserMiddleware, async(req,res)=>{
 
   const query=(req.query.q as string) || "";

@@ -19,6 +19,16 @@ export function Dashboard() {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [filter,setFilter]=useState<"all" | "youtube" | "twitter" | "note">("all");
+  type Content = {
+  _id: string;
+  title: string;
+  link: string;
+  description: string;
+  type: "youtube" | "twitter" | "note";
+  tags: string[];
+};
+
+const [editData, setEditData] = useState<Content | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -75,8 +85,10 @@ export function Dashboard() {
           open={modalOpen}
           onClose={async () => {
             setModalOpen(false);
+            setEditData(null);
             queryClient.invalidateQueries({ queryKey: ["contents"] });
           }}
+          initialData={editData}
         />
         <ShareModal
           open={shareModalOpen}
@@ -135,6 +147,10 @@ export function Dashboard() {
               description={description}
               tags={tags}
               onDelete={() => deleteMutation.mutate(_id)}
+              onEdit={(data)=>{
+                setEditData(data);
+                setModalOpen(true)
+              }}
             />
           ))}
         </div>

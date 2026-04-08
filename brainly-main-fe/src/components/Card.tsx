@@ -1,8 +1,8 @@
 import { DeleteIcon } from "../icons/DeleteIcon";
-import { ShareIcon } from "../icons/ShareIcon";
 import { YoutubeIcon } from "../icons/YoutubeIcon";
 import { XIcon } from "../icons/XIcon";
 import { NoteIcon } from "../icons/NoteIcon";
+import { PencilIcon } from "../icons/PencilIcon";
 
 interface CardProps {
   title: string;
@@ -12,6 +12,7 @@ interface CardProps {
   id: string;
   tags: string[];
   onDelete: (id: string) => void;
+  onEdit: (data: any) => void;
 }
 
 export function Card(props: CardProps) {
@@ -35,12 +36,20 @@ export function Card(props: CardProps) {
             {props.title}
           </div>
           <div className="flex">
-            <div className="pr-2 text-gray-500">
-              {props.type !== "note" && props.link && (
-                <a href={props.link} target="_blank">
-                  <ShareIcon />
-                </a>
-              )}
+            <div
+              className="pr-2 text-gray-500"
+              onClick={() =>
+                props.onEdit({
+                  _id: props.id,
+                  title: props.title,
+                  link: props.link,
+                  description: props.description,
+                  type: props.type,
+                  tags: props.tags,
+                })
+              }
+            >
+              <PencilIcon />
             </div>
             <div className="text-gray-500">
               <div onClick={handleDelete}>
@@ -84,7 +93,10 @@ export function Card(props: CardProps) {
         </div>
         <div className="pt-2 flex flex-wrap gap-2 mt-auto">
           {props.tags.map((tag, index) => (
-            <span key={index} className="text-xs text-purple-600 bg-purple-200 px-2 py-1 rounded">
+            <span
+              key={index}
+              className="text-xs text-purple-600 bg-purple-200 px-2 py-1 rounded"
+            >
               #{tag}
             </span>
           ))}

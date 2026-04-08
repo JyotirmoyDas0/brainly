@@ -5,11 +5,13 @@ import { Input } from "./Input";
 import { useRef, useState } from "react";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 type ContentType = "youtube" | "twitter" | "note";
 
-export function CreateContentModal({ open, onClose }) {
+export function CreateContentModal({ open, onClose, initialData }) {
+  const isEdit= !!initialData;
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
@@ -17,8 +19,30 @@ export function CreateContentModal({ open, onClose }) {
   const [type, setType] = useState<ContentType>("youtube");
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+  if (initialData) {
+    if (titleRef.current) titleRef.current.value = initialData.title;
+    if (linkRef.current) linkRef.current.value = initialData.link;
+    if (descriptionRef.current) descriptionRef.current.value = initialData.description;
+    if (tagRef.current) tagRef.current.value = initialData.tags.join(",");
+    setType(initialData.type);
+  }
+}, [initialData]);
+
   const addMutation = useMutation({
     mutationFn: async ({ title, link, type, description, tags }: any) => {
+      if(isEdit){
+              return axios.put(
+        `${BACKEND_URL}/api/v1/content/${initialData?._id}`,
+        { title, link, type, description, tags },
+        {
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
+        }
+      );
+      }
+      else{
       return axios.post(
         `${BACKEND_URL}/api/v1/content`,
         { title, link, type, description, tags },
@@ -28,11 +52,13 @@ export function CreateContentModal({ open, onClose }) {
           },
         },
       );
+    }
     },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contents"] });
-      toast.success("Contents Added");
+      if(isEdit) toast.success("Contents Updated");
+      else toast.success("Contents Added")
       onClose();
     },
 
@@ -113,7 +139,7 @@ export function CreateContentModal({ open, onClose }) {
                 <Button
                   onClick={addContent}
                   variant="primary"
-                  text="Submit"
+                  text={isEdit?"Update":"Submit"}
                   loading={addMutation.isPending}
                 />
               </div>
