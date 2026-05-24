@@ -3,15 +3,6 @@ import axios from "axios";
 import { Card } from "../components/Card";
 import { useQuery } from "@tanstack/react-query";
 
-type SharedContent = {
-  id: string;
-  type: "youtube" | "twitter" | "note";
-  link: string;
-  title: string;
-  description: string;
-  tags: string[];
-};
-
 export function SharedBrain() {
   const { shareLink } = useParams();
 
