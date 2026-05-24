@@ -9,9 +9,21 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 type ContentType = "youtube" | "twitter" | "note";
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  initialData?: {
+    _id: string;        // add this
+    title: string;
+    link: string;
+    description: string;
+    tags: string[];
+    type: "youtube" | "twitter" | "note";
+  };
+}
 
-export function CreateContentModal({ open, onClose, initialData }) {
-  const isEdit= !!initialData;
+export function CreateContentModal({ open, onClose, initialData }: Props) {
+  const isEdit = !!initialData;
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
@@ -20,45 +32,45 @@ export function CreateContentModal({ open, onClose, initialData }) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-  if (initialData) {
-    if (titleRef.current) titleRef.current.value = initialData.title;
-    if (linkRef.current) linkRef.current.value = initialData.link;
-    if (descriptionRef.current) descriptionRef.current.value = initialData.description;
-    if (tagRef.current) tagRef.current.value = initialData.tags.join(",");
-    setType(initialData.type);
-  }
-}, [initialData]);
+    if (initialData) {
+      if (titleRef.current) titleRef.current.value = initialData.title;
+      if (linkRef.current) linkRef.current.value = initialData.link;
+      if (descriptionRef.current)
+        descriptionRef.current.value = initialData.description;
+      if (tagRef.current) tagRef.current.value = initialData.tags.join(",");
+      setType(initialData.type);
+    }
+  }, [initialData]);
 
   const addMutation = useMutation({
     mutationFn: async ({ title, link, type, description, tags }: any) => {
-      if(isEdit){
-              return axios.put(
-        `${BACKEND_URL}/api/v1/content/${initialData?._id}`,
-        { title, link, type, description, tags },
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
+      if (isEdit) {
+        return axios.put(
+          `${BACKEND_URL}/api/v1/content/${initialData?._id}`,
+          { title, link, type, description, tags },
+          {
+            headers: {
+              Authorization: localStorage.getItem("token"),
+            },
           },
-        }
-      );
+        );
+      } else {
+        return axios.post(
+          `${BACKEND_URL}/api/v1/content`,
+          { title, link, type, description, tags },
+          {
+            headers: {
+              Authorization: localStorage.getItem("token"),
+            },
+          },
+        );
       }
-      else{
-      return axios.post(
-        `${BACKEND_URL}/api/v1/content`,
-        { title, link, type, description, tags },
-        {
-          headers: {
-            Authorization: localStorage.getItem("token"),
-          },
-        },
-      );
-    }
     },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["contents"] });
-      if(isEdit) toast.success("Contents Updated");
-      else toast.success("Contents Added")
+      if (isEdit) toast.success("Contents Updated");
+      else toast.success("Contents Added");
       onClose();
     },
 
@@ -109,7 +121,13 @@ export function CreateContentModal({ open, onClose, initialData }) {
               <div className="p-2 m-4">
                 <Input ref={titleRef} placeholder={"Title"} />
                 {type != "note" && <Input ref={linkRef} placeholder={"Link"} />}
-                {type==="note" && <textarea ref={descriptionRef as any} placeholder={"Description"} className="border p-2 w-full"></textarea>}
+                {type === "note" && (
+                  <textarea
+                    ref={descriptionRef as any}
+                    placeholder={"Description"}
+                    className="border p-2 w-full"
+                  ></textarea>
+                )}
                 <Input ref={tagRef} placeholder={"Tags (e.g react, dsa)"} />
               </div>
               <div className="flex justify-center gap-4">
@@ -139,7 +157,7 @@ export function CreateContentModal({ open, onClose, initialData }) {
                 <Button
                   onClick={addContent}
                   variant="primary"
-                  text={isEdit?"Update":"Submit"}
+                  text={isEdit ? "Update" : "Submit"}
                   loading={addMutation.isPending}
                 />
               </div>

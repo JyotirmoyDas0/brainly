@@ -6,7 +6,7 @@ import { BACKEND_URL } from "../config";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-export function ShareModal({ open, onClose }) {
+export function ShareModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const shareMutation = useMutation({
     mutationFn: async () => {
       const res = await axios.post(

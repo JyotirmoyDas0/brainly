@@ -3,6 +3,15 @@ import axios from "axios";
 import { Card } from "../components/Card";
 import { useQuery } from "@tanstack/react-query";
 
+type SharedContent = {
+  id: string;
+  type: "youtube" | "twitter" | "note";
+  link: string;
+  title: string;
+  description: string;
+  tags: string[];
+};
+
 export function SharedBrain() {
   const { shareLink } = useParams();
 
@@ -42,7 +51,7 @@ export function SharedBrain() {
             {data.content.length === 0 ? (
               <p>No Content Shared</p>
             ) : (
-              data.content.map((item) => (
+              data.content.map((item:any) => (
                 <Card
                   id={item.id}
                   key={item.id}
@@ -51,6 +60,8 @@ export function SharedBrain() {
                   title={item.title}
                   description={item.description}
                   tags={item.tags}
+                  onDelete={() => {}} // read-only view
+                  onEdit={() => {}}
                 />
               ))
             )}

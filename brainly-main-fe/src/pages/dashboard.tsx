@@ -12,14 +12,7 @@ import { BACKEND_URL } from "../config";
 import { useEffect } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
-export function Dashboard() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [shareModalOpen, setShareModalOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [filter,setFilter]=useState<"all" | "youtube" | "twitter" | "note">("all");
-  type Content = {
+type Content = {
   _id: string;
   title: string;
   link: string;
@@ -28,7 +21,17 @@ export function Dashboard() {
   tags: string[];
 };
 
-const [editData, setEditData] = useState<Content | null>(null);
+export function Dashboard() {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [filter, setFilter] = useState<"all" | "youtube" | "twitter" | "note">(
+    "all",
+  );
+
+  const [editData, setEditData] = useState<Content | undefined>(undefined);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -79,13 +82,13 @@ const [editData, setEditData] = useState<Content | null>(null);
 
   return (
     <div>
-      <Sidebar setFilter={setFilter}/>
+      <Sidebar setFilter={setFilter} />
       <div className="p-4 ml-72 min-h-screen bg-gray-100">
         <CreateContentModal
           open={modalOpen}
           onClose={async () => {
             setModalOpen(false);
-            setEditData(null);
+            setEditData(undefined); // was null
             queryClient.invalidateQueries({ queryKey: ["contents"] });
           }}
           initialData={editData}
@@ -137,22 +140,25 @@ const [editData, setEditData] = useState<Content | null>(null);
           {data?.length === 0 && (
             <div className="text-gray-500">No Content</div>
           )}
-          {data?.filter((item:any)=>filter==="all" || item.type ===filter).map(({ _id, type, link, title, description, tags }) => (
-            <Card
-              key={_id}
-              id={_id}
-              type={type}
-              link={link}
-              title={title}
-              description={description}
-              tags={tags}
-              onDelete={() => deleteMutation.mutate(_id)}
-              onEdit={(data)=>{
-                setEditData(data);
-                setModalOpen(true)
-              }}
-            />
-          ))}
+
+          {(data as Content[])
+            ?.filter((item) => filter === "all" || item.type === filter)
+            .map((item) => (
+              <Card
+                key={item._id}
+                id={item._id}
+                type={item.type}
+                link={item.link}
+                title={item.title}
+                description={item.description}
+                tags={item.tags}
+                onDelete={() => deleteMutation.mutate(item._id)}
+                onEdit={(data) => {
+                  setEditData(data);
+                  setModalOpen(true);
+                }}
+              />
+            ))}
         </div>
       </div>
     </div>
