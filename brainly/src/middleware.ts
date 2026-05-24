@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { JWT_PASSWORD } from "./config";
+import { JWT_PASSWORD } from "./config.js";
 
 export const UserMiddleware = (
   req: Request,
