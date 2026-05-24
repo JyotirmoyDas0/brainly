@@ -1,6 +1,5 @@
 import mongoose, {model,Schema} from "mongoose";
 import { MONGO_URL } from "./config.js";
-import { required } from "zod/mini";
 
 mongoose.connect(MONGO_URL)
 

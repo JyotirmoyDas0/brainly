@@ -1,12 +1,12 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { ContentModel, LinkModel, UserModel } from "./db.js";
+import { ContentModel, LinkModel, UserModel } from "./db";
 import { UserMiddleware } from "./middleware.js";
-import { signupSchema } from "./validations/user.js";
+import { signupSchema } from "./validations/user";
 import { v4 as uuidv4 } from "uuid";
 import cors from "cors";
 import bcrypt from "bcrypt";
-import { JWT_PASSWORD, PORT } from "./config.js";
+import { JWT_PASSWORD, PORT } from "./config";
 
 const app = express();
 app.use(express.json());
