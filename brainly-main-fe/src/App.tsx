@@ -6,6 +6,7 @@ import { SharedBrain } from "./pages/SharedBrain";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Landing } from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<Landing/>}/>
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/share/:shareLink" element={<SharedBrain />} />
