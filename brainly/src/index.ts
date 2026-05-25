@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
   }),
 );
 
@@ -66,9 +66,7 @@ app.post("/api/v1/signin", async (req, res) => {
     return res.status(403).json({ message: "incorrect credentials" });
   }
 
-  const token = jwt.sign({ id: user._id }, JWT_PASSWORD, {
-    expiresIn: "1h",
-  });
+  const token = jwt.sign({ id: user._id }, JWT_PASSWORD, { expiresIn: "7d" });
   res.json({
     token,
   });
