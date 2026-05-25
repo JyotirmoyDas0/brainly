@@ -1,4 +1,4 @@
-import { type ReactElement } from "react";  // type-only import
+import { type ReactElement } from "react"; 
 
 export function SidebarItem({
   text,
@@ -7,7 +7,7 @@ export function SidebarItem({
 }: {
   text: string;
   icon?: ReactElement;
-  onClick?: () => void;  // make optional — Sidebar uses it without onClick on Links/Tags
+  onClick?: () => void; 
 }) {
   return (
     <div

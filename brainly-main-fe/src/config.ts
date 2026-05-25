@@ -1,1 +1,1 @@
-export const BACKEND_URL="https://brainly-i9je.onrender.com"
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";

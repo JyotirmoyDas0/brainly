@@ -38,7 +38,6 @@ export function Sidebar({
           text="Note"
           icon={<DocumentIcon />}
         />
-        // These two are missing onClick:
         <SidebarItem
           text="Links"
           icon={<LinkIcon />}
